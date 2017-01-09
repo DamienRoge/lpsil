@@ -1,12 +1,12 @@
 <% var title = 'Formulaire login' %>
 <% include head %>
-
 <h1>Login</h1>
-Accés au <a href="/profile">/profil</a>
+<div class="error_message"> <%= locals.erreur ? locals.erreur : '' %></div>
+Accès au <a href="/profile">/profil</a>
 <form method="post" action="/login">
   <p>
     <label>Username:</label>
-    <input type="text" name="username">
+    <input type="text" name="username" value="damien">
   </p>
   <p>
     <label>Password:</label>

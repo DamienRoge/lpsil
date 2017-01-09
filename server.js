@@ -15,15 +15,42 @@ app.use(express.static(__dirname + '/public')); // Indique que le dossier /publi
 
 logger.info('server start');
 
+
+
+
+
+/* On affiche le formulaire d'enregistrement */
+
 app.get('/', function(req, res){
     res.redirect('/login');
 });
 
 app.get('/login', function(req, res){
+    //res.render('login',{erreur :"Couple identifiant/mot de passe incorrect"});
     res.render('login');
 });
 
+app.post('/login', function (req, res) {
+    // TODO vérifier si l'utilisateur existe
+
+
+
+
+
+    res.render('login',{erreur :"Couple identifiant/mot de passe incorrect"});
+
+
+
+});
+
+app.get('/register', function (req, res) {
+    // TODO ajouter un nouveau utilisateur
+});
+/* On affiche le profile  */
+app.get('/profile', function (req, res) {
+    // TODO
+    // On redirige vers la login si l'utilisateur n'a pas été authentifier
+    // Afficher le button logout
+});
+
 app.listen(1313);
-
-
-
