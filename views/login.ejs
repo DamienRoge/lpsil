@@ -1,19 +1,26 @@
 <% var title = 'Formulaire login' %>
 <% include head %>
 <h1>Login</h1>
-<div class="error_message"> <%= locals.erreur ? locals.erreur : '' %></div>
+<div class="error_message">
+
+    <!-- ERROR MESSAGE-->
+    <% if (locals.error_message) {%>
+   <strong style="color:rgba(255,62,43,0.93)"><%= error_message %></strong>
+    <% }%>
+
+</div>
 Accès au <a href="/profile">/profil</a>
 <form method="post" action="/login">
   <p>
     <label>Username:</label>
-    <input type="text" name="username" value="damien">
+    <input type="text" name="username" value="">
   </p>
   <p>
     <label>Password:</label>
-    <input type="text" name="password">
+    <input type="password" name="password">
   </p>
   <p>
-    <input type="submit" value="Login">
+    <input type="submit" class="btn btn-primary" value="Login">
   </p>
 </form>
 

@@ -8,7 +8,7 @@
     "log4js": "^0.6.29",
     "morgan": "^1.6.1",
     "mysql": "^2.10.2",
-    "nodemon": "^1.11.0",
+    "nodemon": "^1.0.5",
     "serve-favicon": "^2.3.0"
   },
   "author": "Mail <damien.roge@etu.unice.fr>",
