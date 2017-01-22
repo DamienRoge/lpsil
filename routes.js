@@ -40,33 +40,42 @@ router.get('/login', function (req, res) {
         res.redirect('/main');
     }
     else {
-        res.render('login');
+        res.render('login',{session:sess});
     }
+
+});
+
+router.get('/logout', function (req, res) {
+    req.session.destroy();
+
+    res.redirect("/login");
 
 });
 
 /*-- TENTATIVE DE LOGIN --*/
 router.post('/login', function (req, res) {
-
-    bdd_singleton.doQuery("SELECT * FROM USER", function(err,rows,fields){
+    var sess = req.session;
+    bdd_singleton.doQuery("SELECT email,nom,prenom,password,id, CONVERT(profilepic USING utf8) as profilepic FROM USERS", function(err,rows,fields){
         if(err){
+            console.log(err);
             res.render('login',{error_message : "Unable to connect users database, please try later"});
         }
         else
         {
             var rowsLength = rows.length;
             for (var i = 0; i < rowsLength; i++) {
-
-                if(req.body.username == rows[i].username && req.body.password == rows[i].password){
+                if(req.body.username == rows[i].email && req.body.password == rows[i].password){
                     //TODO demarrer session
-                    var sess = req.session;
                     sess.username=req.body.username;
-                    res.redirect('/main');
+                    sess.nom=rows[i].nom;
+                    sess.prenom=rows[i].prenom;
+                    sess.profilepic=rows[i].profilepic;
+                    sess.u_id=rows[i].id;
 
+                    res.redirect('/profile');
                 }
-
             }
-            if(!sess.username)
+            if(!("username" in sess))
                 res.render('login',{error_message : "Bad username/password :("});
 
 
@@ -82,7 +91,7 @@ router.get('/main',localSession,function(req,res){
         res.render("main");
     }
     else {
-        res.render('login', {error_message: "Veuillez vous connecter"});
+        res.render('login', {session:sess,error_message: "Veuillez vous connecter"});
     }
 
 });
@@ -94,13 +103,34 @@ router.get('/register', function (req, res) {
 router.get('/profile',localSession, function (req, res) {
     var sess = req.session;
     if(sess.username) {
-        /*
-         * This line check Session existence.
-         * If it existed will do some action.
-         */
 
-        //TODO Récuperer les infos de l'utilisateur et les passer à la vue
-        res.render('profile');
+        bdd_singleton.doQuery("SELECT *,DATE_FORMAT(birthdate, \"%Y-%m-%d\") AS 'birthdate2' FROM USERS WHERE id="+sess.u_id, function(err,rows,fields){
+            if(err){
+                //console.log(err);
+                res.render('profile',{error_message : "Unable to connect users database, please try later"});
+            }
+            else{
+                if(rows[1]!=undefined){
+                    res.render('profile',{error_message : "Error, please contact an admin"});
+
+                }
+                else {
+                    var user_infos = {
+                        tel: rows[0].tel,
+                        website: rows[0].website,
+                        birthdate: rows[0].birthdate2,
+                        ville: rows[0].ville,
+                        taille: rows[0].taille,
+                        couleur: rows[0].couleur,
+                        sexe: rows[0].sexe
+                    };
+                    //TODO Récuperer les infos de l'utilisateur et les passer à la vue
+                    res.render('profile', {session: sess, user_infos: user_infos});
+                }
+            }
+        });
+
+
     }
     else {
         //res.write("<strong style='color:rgba(255,62,43,0.93)'>Veuillez vous connecter<strong>");
@@ -113,37 +143,121 @@ router.get('/inscription', function(req,res){
 });
 
 router.post('/inscription', function(req,res){
-//Connexion bdd
-    //if (deja email deja dans la bdd)
-        //redirect main
-    //else
-        //add to db
-    render('inscription',{error_message:"e-mail déjà utilisée"})
 
-    bdd_singleton.doQuery("SELECT * FROM USER", function(err,rows,fields){
+    //TODO echapper tout ça
+    var email = req.body.email;
+    var prenom = req.body.prenom;
+    var nom = req.body.nom;
+    var tel = req.body.tel;
+    var website = req.body.website;
+    var sexe = "";
+    if("sexe" in req.body)
+        sexe = req.body.sexe;
+    var password = req.body.password;
+    var birthdate = req.body.birthdate;
+    var ville = req.body.ville;
+    var taille = req.body.taille;
+    var couleur = req.body.couleur.replace("#","");
+    var profilepic = req.body.profilepic;
+
+
+
+
+    bdd_singleton.doQuery("SELECT * FROM USERS", function(err,rows,fields){
 
         if(err){
+            console.log(err);
             res.render('inscription',{error_message : "Unable to connect users database, please try later"});
         }
-        else
-        {
+        else{
+            var isPresent = false;
             var rowsLength = rows.length;
             for (var i = 0; i < rowsLength; i++) {
-
                 if(req.body.email == rows[i].email){
-
-                    render('inscription',{error_message:"e-mail déjà utilisée"})
-
+                    render('inscription',{error_message:"e-mail déjà utilisé"});
+                    isPresent=true;
                 }
+            }
+            if(isPresent==false){//Ajout de l'utilisateur
+                bdd_singleton.doQuery("INSERT INTO USERS (email, password, nom, prenom, tel, website, sexe, birthdate, ville, taille, couleur, profilepic) VALUES ('" +
+                    email+"','"+password+"','"+nom+"','"+prenom+"','"+tel+"','"+website+"','"+sexe+"','"+birthdate+"','"+ville+"',"+taille+",'"+couleur+"','"+profilepic+"')", function(err,rows,fields){
+                    if(err){
+                        console.log(err);
+                        res.render('inscription',{error_message : "Erreur lors de votre inscription, reesayez plus tard"});
+                    }else
+                    res.redirect("/login");
 
+                });
             }
 
         }
     });
 
-
-
     });
 
+
+router.post('/profile', function(req,res){
+    var sess = req.session;
+
+    //TODO echapper tout ça
+    var email = req.body.email;
+    var prenom = req.body.prenom;
+    var nom = req.body.nom;
+    var tel = req.body.tel;
+    var website = req.body.website;
+    var sexe = "";
+    if("sexe" in req.body)
+        sexe = req.body.sexe;
+    //var password = req.body.password;
+    var birthdate = req.body.birthdate;
+    var ville = req.body.ville;
+    var taille = req.body.taille;
+    var couleur = req.body.couleur.replace("#","");
+    var profilepic = req.body.profilepic;
+
+
+
+    bdd_singleton.doQuery("UPDATE USERS SET " +
+        "email=" +"'"+email+"'"+","+
+        "prenom=" +"'"+prenom+"'"+","+
+        "nom=" +"'"+nom+"'"+","+
+        "tel=" +"'"+tel+"'"+","+
+        "website=" +"'"+website+"'"+","+
+        "sexe=" +"'"+sexe+"'"+","+
+        "birthdate=" +"'"+birthdate+"'"+","+
+        "ville=" +"'"+ville+"'"+","+
+        "taille=" +taille+","+
+        "couleur=" +"'"+couleur+"'"+","+
+        "profilepic=" +"'"+profilepic+"'"+" "+
+        "WHERE id="+sess.u_id, function(err,rows,fields){
+
+        if(err){
+            console.log(err);
+            res.render('profile',{session:sess, error_message : "Unable to connect users database, please try later"});
+        }
+        else{
+
+            sess.username=email;
+            sess.nom=nom;
+            sess.prenom=prenom;
+            sess.profilepic=profilepic;
+            res.redirect("/profile");
+
+
+        }
+    });
+
+});
+
+
+/* PAINT*/
+
+router.get('/paint',function (req,res) {
+
+});
+
+router.post('/paint',function (req,res) {
+
+});
 
 module.exports = router;
