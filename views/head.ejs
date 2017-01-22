@@ -4,7 +4,6 @@
     <title><%= title %></title>
     <style>
         body {
-            padding: 50px;
             font: 13px Helvetica, Arial, sans-serif;
         }
         .error {
@@ -13,7 +12,12 @@
         .success {
             color: green;
         }
+        #monBodyContainer{
+            padding-left:5%;
+            padding-right:5%;
+        }
     </style>
+    <link rel="stylesheet" media="screen" href="css/styles.css" >
 
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link href="favicon.ico" rel="icon" type="image/x-icon" />
@@ -23,9 +27,60 @@
 
 </head>
 <body>
-<% if(locals.session){%>
-    Bonjour <%= session.username%>
-<%}else{%>
-    Bonjour Invité
-<%}%>
-<hr>
+<nav style="margin:0px" class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="main.php">Pictionnary by Damien R.</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <% if(session.username){%>
+                    <li><a href="/logout">Deconnexion</a></li>
+                <%}else{%>
+                    <li><a href="/login">Connexion</a></li>
+                <%}%>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div style="margin-top: 0px;background-color: rgba(250,250,250,0.93)" class="page-header">
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+            <li>
+                <% if(session.username){%>
+                <img style="width :80px;height:80px; margin-right: 1em;margin-top: 1em" src="<%= session.profilepic%>"/>
+                Bonjour <%= session.prenom%> <%= session.nom%>
+                <%}else{%>
+                <img src="css/images/invite.png" style="width :50px;height:50px; margin-right: 1em;margin-top: 1em" />
+                Bonjour Invité
+                <%}%>
+            </li>
+
+
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <% if(session.username){%>
+            <li><a style="color:grey" href="/profile">Editer votre profil</a></li>
+            <%}%>
+        </ul>
+    </div><!-- /.navbar-collapse -->
+</div><!-- /.container-fluid -->
+
+
+
+<div id="monBodyContainer">
+
