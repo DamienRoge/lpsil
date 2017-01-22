@@ -9,7 +9,8 @@
 module.exports.doQuery = function (query,callback) {
 
     var mysql = require('mysql');
-
+    console.log("query : ----------------------");
+    console.log(query);
 
     var connection = mysql.createConnection({
         host: 'localhost',
@@ -19,9 +20,6 @@ module.exports.doQuery = function (query,callback) {
     });
 
     // connection.connect();
-
-
-    var monReturn = "ERROR BUDDY";
 
     connection.query(query, callback);
 
