@@ -1,96 +1,201 @@
-<% var title = 'Your profile' %>
+<% var title = 'Votre profile' %>
 <% include head %>
+<% if(!locals.user_infos){
+    user_infos={
+        tel:" ",
+        website:"",
+        birthday:"",
+        ville:"",
+        taille:"",
+        couleur:""};
+}
+%>
+<%
 
-<div class="container" style="padding-top: 60px;">
-    <h1 class="page-header">Edit Profile</h1>
-    <div class="row">
-        <!-- left column -->
-        <div class="col-md-4 col-sm-6 col-xs-12">
-            <div class="text-center">
-                <img src="https://fb-s-b-a.akamaihd.net/h-ak-xfa1/v/t1.0-1/c9.0.160.160/p160x160/420257_10151474103567424_1224916620_n.jpg?oh=0932a7be9adb74fd949d0211d9128ad7&oe=58BA7A17&__gda__=1488564886_feb0fc02d6307304a3d43aecff5a804a" class="avatar img-circle img-thumbnail" alt="avatar">
-                <h6>Upload a different photo...</h6>
-                <input type="file" class="text-center center-block well well-sm">
+
+
+ %>
+<!-- ERROR MESSAGE-->
+<% if (locals.error_message) {%>
+<strong style="color:rgba(255,62,43,0.93)"><%= error_message %></strong>
+<% }%>
+
+<form method="post" action="/profile">
+    <div class="container" style="">
+        <h1 class="page-header">Editer votre profile</h1>
+        <div class="row">
+            <!-- left column -->
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="text-center">
+                    <img src="<%=session.profilepic%>" id="profilepic" class="avatar img-circle img-thumbnail" alt="avatar">
+                    <script>
+                    </script>
+                    <h6>Charger un nouvelle photo de profile...</h6>
+                    <input type="hidden" name="profilepic" id="profilepicSaver" value="<%=session.profilepic%>"><!-- PROFILEPIC -->
+                    <input type="file" id="profilepicfile" onchange="loadProfilePic(this)" class="text-center center-block well well-sm">
+                </div>
             </div>
-        </div>
-        <!-- edit form column -->
-        <div class="col-md-8 col-sm-6 col-xs-12 personal-info">
-            <div class="alert alert-info alert-dismissable">
-                <a class="panel-close close" data-dismiss="alert">×</a>
-                <i class="fa fa-coffee"></i>
-                This is an <strong>.alert</strong>. Use this to show important messages to the user.
-            </div>
-            <h3>Personal info</h3>
-            <form class="form-horizontal" role="form">
-                <div class="form-group">
-                    <label class="col-lg-3 control-label">First name:</label>
-                    <div class="col-lg-8">
-                        <input class="form-control" value="Estela" type="text">
-                    </div>
+            <!-- edit form column -->
+            <div class="col-md-8 col-sm-6 col-xs-12 personal-info">
+                <div class="alert alert-info alert-dismissable">
+                    <a class="panel-close close" data-dismiss="alert">×</a>
+                    <i class="fa fa-coffee"></i>
+                    Ici vous pouvez éditer vos informations.
                 </div>
-                <div class="form-group">
-                    <label class="col-lg-3 control-label">Last name:</label>
-                    <div class="col-lg-8">
-                        <input class="form-control" value="Silva" type="text">
+                <h3>Informations personnelles</h3>
+                <div class="form-horizontal" role="form">
+                    <div class="form-group"> <!-- EMAIL -->
+                        <label class="col-lg-3 control-label">Email:</label>
+                        <div class="col-lg-8">
+                            <input name="email" class="form-control" value="<%=session.username%>" type="text">
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-lg-3 control-label">Company:</label>
-                    <div class="col-lg-8">
-                        <input class="form-control" value="http://tuconsultoraseo.com" type="text">
+                    <div class="form-group"><!-- PRENOM -->
+                        <label class="col-lg-3 control-label">Prenom:</label>
+                        <div class="col-lg-8">
+                            <input name="prenom" class="form-control" value="<%=session.prenom%>" type="text">
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-lg-3 control-label">Email:</label>
-                    <div class="col-lg-8">
-                        <input class="form-control" value="carmenestelasi@gmail.com" type="text">
+                    <div class="form-group"><!-- NOM -->
+                        <label class="col-lg-3 control-label">Nom:</label>
+                        <div class="col-lg-8">
+                            <input name="nom" class="form-control" value="<%=session.nom%>" type="text">
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-lg-3 control-label">Time Zone:</label>
-                    <div class="col-lg-8">
-                        <div class="ui-select">
-                            <select id="user_time_zone" class="form-control">
-                                <option value="Hawaii">(GMT-10:00) Hawaii</option>
-                                <option value="Alaska">(GMT-09:00) Alaska</option>
-                                <option value="Pacific Time (US & Canada)">(GMT-08:00) Pacific Time (US & Canada)</option>
-                                <option value="Arizona">(GMT-07:00) Arizona</option>
-                                <option value="Mountain Time (US & Canada)">(GMT-07:00) Mountain Time (US & Canada)</option>
-                                <option value="Central Time (US & Canada)" selected="selected">(GMT-06:00) Central Time (US & Canada)</option>
-                                <option value="Eastern Time (US & Canada)">(GMT-05:00) Eastern Time (US & Canada)</option>
-                                <option value="Indiana (East)">(GMT-05:00) Indiana (East)</option>
-                            </select>
+                    <div class="form-group"><!-- TEL -->
+                        <label class="col-lg-3 control-label">Tel:</label>
+                        <div class="col-lg-8">
+                            <input name="tel" class="form-control" value="<%=user_infos.tel%>" type="text">
+                        </div>
+                    </div>
+
+                    <div class="form-group"><!-- SITEWEB -->
+                        <label class="col-lg-3 control-label">Site web:</label>
+                        <div class="col-lg-8">
+                            <input name="website" class="form-control" value="<%=user_infos.website%>" type="text">
+                        </div>
+                    </div>
+                    <div class="form-group"><!-- SEXE -->
+                        <label class="col-lg-3 control-label">Sexe:</label>
+                        <div class="col-lg-8">
+                            <label for="sexe">-</label>
+                            <label style="all:initial">Homme</label>
+                            <input style="width: 20px;" type="radio" name="sexe" id="sexe" value="h" <%if(user_infos.sexe=="h"){%> checked="checked" <%}%>/>
+                            <label style="all:initial;width: 5px;">- Femme</label>
+                            <input style="width: 20px;" type="radio" name="sexe" id="sexe" value="f" <%if(user_infos.sexe=="f"){%> checked="checked" <%}%>/>
+                        </div>
+                    </div>
+                    <script>
+
+                    </script>
+
+                    <div class="form-group"><!-- DATE DE NAISSANCE -->
+                        <label class="col-lg-3 control-label">Date de naissance:</label>
+                        <div class="col-lg-8">
+                            <input type="date" name="birthdate" id="birthdate" placeholder="JJ/MM/AAAA" required   value="<%= user_infos.birthdate%>"/>
+                        </div>
+                    </div>
+                    <div class="form-group"><!-- VILLE -->
+                        <label class="col-lg-3 control-label">Ville:</label>
+                        <div class="col-lg-8">
+                            <input name="ville"  required class="form-control" value="<%=user_infos.ville%>" type="text">
+                        </div>
+                    </div>
+                    <div class="form-group"><!-- COULEUR -->
+                        <label class="col-lg-3 control-label">Couleur:</label>
+                        <div class="col-lg-8">
+                            <input name="couleur" type="color" value="#555555" name="couleur" id="couleur"  value="<%user_infos.couleur%>"/>
+                        </div>
+                    </div>
+                    <div class="form-group"><!-- TAILLE -->
+                        <label class="col-lg-3 control-label">Taille:</label>
+                        <div style="margin:10px" class="col-lg-8">
+                            <input name="taille" type="range" max="2.30" min="1" step="0.01" name="taille" id="taille" oninput="result4.value=parseFloat(taille.value)"  value="<%=user_infos.taille%>"/>
+                            <output style="display:inline" name="result4"><%=user_infos.taille%></output>m
+                        </div>
+                    </div>
+                    <div class="form-group"><!-- SUBMIT -->
+                        <label class="col-md-3 control-label"></label>
+                        <div class="col-md-8">
+                            <input class="btn btn-primary" value="Save Changes" type="submit">
+                            <span></span>
+                            <a href="main"><input class="btn btn-default" value="Cancel" type="button"></a>
                         </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="col-md-3 control-label">Username:</label>
-                    <div class="col-md-8">
-                        <input class="form-control" value="janeuser" type="text">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-3 control-label">Password:</label>
-                    <div class="col-md-8">
-                        <input class="form-control" value="11111122333" type="password">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-3 control-label">Confirm password:</label>
-                    <div class="col-md-8">
-                        <input class="form-control" value="11111122333" type="password">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-3 control-label"></label>
-                    <div class="col-md-8">
-                        <input class="btn btn-primary" value="Save Changes" type="button">
-                        <span></span>
-                        <input class="btn btn-default" value="Cancel" type="reset">
-                    </div>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
+
+</form>
+<canvas style="display:none" id="preview" width="0" height="0"></canvas>
+
+<script>
+    loadProfilePic = function (e) {
+        // on récupère le canvas où on affichera l'image
+        var canvas = document.getElementById("preview");
+        var ctx = canvas.getContext("2d");
+        // on réinitialise le canvas: on l'efface, et déclare sa largeur et hauteur à 0
+        //ctx.setFillColor("white");
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        canvas.width=0;
+        canvas.height=0;
+        // on récupérer le fichier: le premier (et seul dans ce cas là) de la liste
+        var file = document.getElementById("profilepicfile").files[0];
+        // l'élément img va servir à stocker l'image temporairement
+        var img = document.createElement("img");
+        // l'objet de type FileReader nous permet de lire les données du fichier.
+        var reader = new FileReader();
+        // on prépare la fonction callback qui sera appelée lorsque l'image sera chargée
+        reader.onload = function(e) {
+            //on vérifie qu'on a bien téléchargé une image, grâce au mime type
+            if (!file.type.match(/image.*/)) {
+                // le fichier choisi n'est pas une image: le champs profilepicfile est invalide, et on supprime sa valeur
+                document.getElementById("profilepicfile").setCustomValidity("Il faut télécharger une image.");
+                document.getElementById("profilepicfile").value = "";
+            }
+            else {
+                // le callback sera appelé par la méthode getAsDataURL, donc le paramètre de callback e est une url qui contient
+                // les données de l'image. On modifie donc la source de l'image pour qu'elle soit égale à cette url
+                // on aurait fait différemment si on appelait une autre méthode que getAsDataURL.
+                img.src = e.target.result;
+                // le champs profilepicfile est valide
+                document.getElementById("profilepicfile").setCustomValidity("");
+                var MAX_WIDTH = 96;
+                var MAX_HEIGHT = 96;
+                var width = img.width;
+                var height = img.height;
+
+                // A FAIRE: si on garde les deux lignes suivantes, on rétrécit l'image mais elle sera déformée
+                // Vous devez supprimer ces lignes, et modifier width et height pour:
+                //    - garder les proportions,
+                //    - et que le maximum de width et height soit égal à 96
+                var ratio = width<height;
+                if(width<height){
+                    width = 96*width/height;
+                    height = 96;
+                }else {
+                    height = 96*height/width;
+                    width = 96;
+                }
+
+
+                canvas.width = width;
+                canvas.height = height;
+                // on dessine l'image dans le canvas à la position 0,0 (en haut à gauche)
+                // et avec une largeur de width et une hauteur de height
+                ctx.drawImage(img, 0, 0, width, height);
+                // on exporte le contenu du canvas (l'image redimensionnée) sous la forme d'une data url
+                var dataurl = canvas.toDataURL("image/png");
+                // on donne finalement cette dataurl comme valeur au champs profilepic
+                document.getElementById("profilepic").src = dataurl;
+                document.getElementById("profilepicSaver").value = dataurl;
+            };
+        }
+        // on charge l'image pour de vrai, lorsque ce sera terminé le callback loadProfilePic sera appelé.
+        reader.readAsDataURL(file);
+    }
+</script>
+</div><!-- myBodyContainer end tag-->
 
 <% include foot %>
