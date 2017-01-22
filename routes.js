@@ -3,6 +3,7 @@ var morgan = require('morgan'); // Charge le middleware de logging
 var logger = require('log4js').getLogger('Server');
 var bodyParser = require('body-parser');
 var bdd_singleton = require('./bdd_singleton'); // BDD
+var fs = require('fs');
 var session = require('express-session');
 var router = express();
 
@@ -58,7 +59,7 @@ router.post('/login', function (req, res) {
     bdd_singleton.doQuery("SELECT email,nom,prenom,password,id, CONVERT(profilepic USING utf8) as profilepic FROM USERS", function(err,rows,fields){
         if(err){
             console.log(err);
-            res.render('login',{error_message : "Unable to connect users database, please try later"});
+            res.render('login',{session:sess,error_message : "Unable to connect users database, please try later"});
         }
         else
         {
@@ -72,11 +73,11 @@ router.post('/login', function (req, res) {
                     sess.profilepic=rows[i].profilepic;
                     sess.u_id=rows[i].id;
 
-                    res.redirect('/profile');
+                    res.redirect('/main');
                 }
             }
             if(!("username" in sess))
-                res.render('login',{error_message : "Bad username/password :("});
+                res.render('login',{session:sess,error_message : "Bad username/password :("});
 
 
         }
@@ -253,11 +254,56 @@ router.post('/profile', function(req,res){
 /* PAINT*/
 
 router.get('/paint',function (req,res) {
+    var sess = req.session;
+    if(sess.username){
 
-});
+        //Loading du mot a dessiner
+        fs.readFile(__dirname+"/public/mots.txt", 'utf8',function (err,data) {
+
+            var array_mots = data.split(", ");
+            var random_index = Math.floor((Math.random() * array_mots.length) + 1);
+            console.log(err);
+            console.log(data);
+            res.render("paint",{session:sess,mot:array_mots[random_index]});
+
+        });
+
+    }
+    else {
+        res.render('login', {session:sess,error_message: "Veuillez vous connecter"});
+    }});
 
 router.post('/paint',function (req,res) {
+    var sess = req.session;
 
+    var commands = req.body.drawingCommands;
+    var reponse = req.body.reponse;
+    var picture = req.body.picture;
+    var laDate = new Date();
+    var date = ""+laDate.getFullYear()+"-"+laDate.getMonth()+1+"-"+laDate.getDate()+" "+laDate.getHours()+":"+laDate.getMinutes()+":"+laDate.getSeconds();
+
+
+    console.log(req.body);
+
+    bdd_singleton.doQuery("INSERT INTO DRAWINGS (u_id,drawingsCommands,reponse,date,picture) VALUES(" +
+        sess.u_id+","+
+        "'"+commands+"'"+","+
+        "'"+reponse+"'"+","+
+        "'"+date+"'"+","+
+        "'"+picture+"'"+")"
+        , function(err,rows,fields){
+
+        if(err){
+            console.log(err);
+            res.render('profile',{session:sess, error_message : "Unable to connect users database, please try later"});
+        }
+        else{
+
+            res.redirect("/profile");
+
+
+        }
+    });
 });
 
 module.exports = router;
