@@ -1,0 +1,116 @@
+<% var title = 'Formulaire login' %>
+<%include head%>
+
+
+<script>
+    // la taille et la couleur du pinceau
+    var size, color;
+    // la dernière position du stylo
+    var x0, y0;
+    // le tableau de commandes de dessin à envoyer au serveur lors de la validation du dessin
+
+        var txt = document.createElement("text");
+        txt.innerHTML = "<%= commands%>"; //Black magic
+        var drawingCommands = txt.innerHTML;
+        drawingCommands =JSON.parse(drawingCommands);
+
+
+
+    window.onload = function() {
+        var canvas = document.getElementById('myCanvas');
+        canvas.width = 400;
+        canvas.height= 400;
+        var context = canvas.getContext('2d');
+
+        var start = function(c) {
+            console.log(c.size);
+            console.log(c.color);
+
+
+            // complétez todo
+            size = c.size;
+            color = c.color;
+
+        }
+
+        var draw = function(c) {
+            console.log(c.command);
+            // complétez todo
+            context.beginPath();
+            context.arc(c.x-emplacement_canvas.left,c.y-emplacement_canvas.top-50,size,0,Math.PI*2,true);
+            context.strokeStyle = color;
+            context.fillStyle = color;
+            context.fill();
+            context.stroke();
+        }
+
+        var clear = function() {
+
+            // complétez todo
+            context.clearRect(0,0,document.getElementById('myCanvas').width,document.getElementById('myCanvas').height);
+        }
+
+        // étudiez ce bout de code todo
+        var i = 0;
+        var iterate = function() {
+            if(i>=drawingCommands.length)
+                return;
+            var c = drawingCommands[i];
+            switch(c.command) {
+                case "start":
+                    start(c);
+                    break;
+                case "draw":
+                    draw(c);
+                    break;
+                case "clear":
+                    clear();
+                    break;
+                default:
+                    console.error("cette commande n'existe pas "+ c.command);
+            }
+            i++;
+            setTimeout(iterate,1);
+        };
+
+        iterate();
+
+    };
+
+    /* PARTIE SAISIE DE LA REPONSE */
+
+    var reponses =[];
+
+
+</script>
+
+<canvas style=" border:1px solid #428bca;" id="myCanvas"></canvas>
+<script>
+    //Emplacement du canvas , permet de compenser la taille du header au moment de tracer le cercle
+    var emplacement_canvas = document.getElementById("myCanvas").getBoundingClientRect();
+    console.log(emplacement_canvas.left);
+    console.log(emplacement_canvas.top);
+
+</script>
+
+
+<div style="margin: 1em;max-width: 500px;" class="panel panel-default">
+    <div class="panel-heading">Vos réponses</div>
+    <div class="panel-body">
+        <form name="login" action="guess" method="post" accept-charset="utf-8">
+            <input type="hidden" name="d_id" value="<%=d_id%>">
+            <input type="text" name="proposition" class="form-control" id="inputReponse" placeholder="Votre réponse" required>
+            <input type="text" name="nom" class="form-control" placeholder="Votre nom" required>
+            <button type="submit" class="btn btn-primary">J'ai trouvé ?</button>
+        </form>
+        <ul id="reponse_container">
+
+        </ul>
+    </div>
+</div>
+
+
+
+
+<a href="main.php">Abandonner</a>
+</div>

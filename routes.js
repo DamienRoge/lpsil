@@ -89,12 +89,22 @@ router.get('/main',localSession,function(req,res){
     var sess = req.session;
 
     if(sess.username){
-
+/*
         bdd_singleton.doQuery("SELECT * FROM DRAWINGS WHERE u_id="+sess.u_id,function (err,rows,fields) {
 
-            res.render("completed",{session:sess,dessins:rows});
+            var dessins_infos=[];
+            for(var i =0 ; i<rows.length ; i++){
+                var infos = {picture:rows[i].picture,reponse:rows[i].reponse,joueurs:[]};
+                    bdd_singleton.doQuery("SELECT * FROM reponses WHERE d_id="+rows[i].id,function (err2,rows2,fields2) {
+                        for(var j =0 ; j<rows2.length ; j++) {
+                            infos.joueurs.push(rows2[j].nom);
+                        }
+                        });
+                }
+*/
+            res.render("main",{session:sess});
 
-        });
+        //});
 
         res.render("main");
     }
@@ -313,6 +323,54 @@ router.post('/paint',function (req,res) {
 
         }
     });
+});
+
+router.get('/guess',function(req,res){
+    var sess = req.session;
+
+    var d_id = req.param('d_id');
+
+    bdd_singleton.doQuery("SELECT * FROM DRAWINGS WHERE id="+d_id,function (err,rows,fields) {
+
+        res.render("guess",{session:sess,d_id:d_id,commands:rows[0].drawingsCommands});
+
+
+    });
+
+});
+
+router.post('/guess',function(req,res){
+    var sess = req.session;
+
+    var d_id = req.body.d_id;
+    var reponse = req.body.proposition;
+    var nom = req.body.nom;
+
+    bdd_singleton.doQuery("SELECT reponse FROM DRAWINGS WHERE id="+d_id,function (err,rows,fields) {
+
+        if(err)
+            console.log(err);
+
+        console.log(rows[0].reponse);
+        console.log(reponse);
+
+        if(rows[0].reponse == reponse){
+
+
+            bdd_singleton.doQuery("INSERT INTO REPONSES VALUES ("+
+                "'" + d_id + "',"+
+                "'" + nom + "'"+
+                ")",function (err,rows,fields) {
+                if(err){
+                    console.log(err);
+                }
+            });
+
+        }
+
+
+    });
+
 });
 
 module.exports = router;
