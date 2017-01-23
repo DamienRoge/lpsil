@@ -89,6 +89,13 @@ router.get('/main',localSession,function(req,res){
     var sess = req.session;
 
     if(sess.username){
+
+        bdd_singleton.doQuery("SELECT * FROM DRAWINGS WHERE u_id="+sess.u_id,function (err,rows,fields) {
+
+            res.render("completed",{session:sess,dessins:rows});
+
+        });
+
         res.render("main");
     }
     else {
@@ -97,9 +104,7 @@ router.get('/main',localSession,function(req,res){
 
 });
 
-router.get('/register', function (req, res) {
-    // TODO ajouter un nouveau utilisateur
-});
+
 /* On affiche le profile  */
 router.get('/profile',localSession, function (req, res) {
     var sess = req.session;
@@ -298,8 +303,12 @@ router.post('/paint',function (req,res) {
             res.render('profile',{session:sess, error_message : "Unable to connect users database, please try later"});
         }
         else{
+            bdd_singleton.doQuery("SELECT MAX(id) AS id FROM DRAWINGS WHERE u_id="+sess.u_id+" GROUP BY u_id",function (err,rows,fields) {
 
-            res.redirect("/profile");
+                res.render("completed",{session:sess,picture:picture,d_id:rows[0].id});
+
+            });
+
 
 
         }

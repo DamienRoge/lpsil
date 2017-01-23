@@ -1,0 +1,12 @@
+<% var title = 'Pictionnary' %>
+<% include head %>
+
+<img style="border: 1px solid #537cff" src="<%=picture%>"/>
+<br>
+<br>
+Voilà un dessin pour le moins ... intéressant.<br>
+Tu es sûr de vouloir tweeter ça ? <br>
+<a href="https://twitter.com/share" class="twitter-share-button" data-size="large" data-text="Je viens de finir mon plus beau chef d&#39;oeuvre ! Peux-tu deviner de quoi il s&#39;agit ?" data-url="http://localhost:1313/guess?d_id=<%=d_id%>" data-show-count="false">Tweet</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script><br>
+<a href="main"><button class="btn btn-primary">Continuer</button></a>
+</div><!-- myBodyContainer end tag-->
+<% include foot%>
